@@ -23,12 +23,12 @@ namespace ga
 
 		blade<n> IJ = I | J; // XOR to combine basis blades
 		// Count the number of swaps needed to order the basis blades
-		for (size_t i = 0, j = 0; i < n and j < n;	)
+		for (size_t i = 0, j = 0; i < n and j < n; ++i, ++j)
 		{
-			if (i < j) {
+			if (I.test(i)) {
 				++i;
 			}
-			else {
+			else if (J.test(j)) {
 				sign |= (n - i)%2;
 				++j;
 			}
