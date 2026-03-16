@@ -13,7 +13,7 @@ are _independent_. The _dimension_ is one less than the order.
 A fundamental results is that if $P\in E$ and $P P_0 \cdots P_k = 0$ and
 $P_0,\ldots P_k$ are independent then
 
-$P = \sum_{j = 0}^k P_0 \cots P_{j-1} P P_{j + 1}\cdots P_k/P_0\cdots P_k$.
+$P = \sum_{j = 0}^k P_0 \cdots P_{j-1} P P_{j + 1}\cdots P_k/P_0\cdots P_k$.
 
 $P$ belongs to the smallest convex set containing $P_0,\ldots, P_k$ if
 and only if all coefficients are non-negative. $P$ belongs to the smallest
