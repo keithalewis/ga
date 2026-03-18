@@ -18,7 +18,7 @@ namespace fms::ga
 
 	// Index of largest set bit
 	template<std::size_t N = 64>
-	constexpr std::size_t high_bit(const blade<N>& p)
+	constexpr std::size_t order(const blade<N>& p)
 	{
 		if (p.none()) {
 			return 0; // no bits set
@@ -32,12 +32,12 @@ namespace fms::ga
 
 		return 0; // no bits set
 	}
-	static_assert(high_bit(blade<5>(0b0)) == 0);
-	static_assert(high_bit(blade<5>(0b1)) == 1);
-	static_assert(high_bit(blade<5>(0b10)) == 2);
-	static_assert(high_bit(blade<5>(0b10000)) == 5);
-	static_assert(high_bit(blade<5>(0b10100)) == 5);
-	static_assert(high_bit(blade<5>(0b10101)) == 5);
+	static_assert(order(blade<5>(0b0)) == 0);
+	static_assert(order(blade<5>(0b1)) == 1);
+	static_assert(order(blade<5>(0b10)) == 2);
+	static_assert(order(blade<5>(0b10000)) == 5);
+	static_assert(order(blade<5>(0b10100)) == 5);
+	static_assert(order(blade<5>(0b10101)) == 5);
 
 	// P_i
 	template<std::size_t N = 64>
@@ -45,6 +45,9 @@ namespace fms::ga
 	{
 		return blade<N>().set(i);
 	}
+	static_assert(order(P(0)) == 1);
+	static_assert(order(P(1)) == 2);
+	static_assert(order(P(4)) == 5);
 
 	// 0b1101 -> "0.2.3"
 	// non-zero blade bit positions
@@ -70,6 +73,7 @@ namespace fms::ga
 
 		return { b, std::errc() };
 	}
+	//constexpr auto xxx = to_chars("0.2.3");
 	/*
 	namespace {
 		constexpr char buf[17];
@@ -161,7 +165,8 @@ namespace fms::ga
 	template <std::size_t N>
 	struct blade_less {
 		static constexpr bool operator()(const blade<N>& a, const blade<N>& b) {
-			return a.to_string() < b.to_string();
+			//return a.to_string() < b.to_string();
+			return a.to_ullong() < b.to_ullong(); // only if N <= 64
 		}
 	};
 	static_assert(blade_less<5>()(blade<5>("1"), blade<5>("10")) == true);
@@ -212,7 +217,7 @@ namespace fms::ga
 			x_[p] = x;
 		}
 
-		// Point corresponding to sum_i x_i P_i.
+		// Point corresponding to sum_i x_i P_i with weight sum_i x_i.
 		template<std::size_t N_ = N>
 			requires (N_ <= N || N_ == std::dynamic_extent)
 		constexpr extent(const std::span<const T, N_>& x)
@@ -232,6 +237,10 @@ namespace fms::ga
 		{
 			return x_.size();
 		}
+		constexpr bool empty() const
+		{
+			return x_.empty();
+		}
 		constexpr auto begin() const
 		{
 			return x_.begin();
@@ -240,6 +249,7 @@ namespace fms::ga
 		{
 			return x_.end();
 		}
+
 		// access coefficient by basis blade
 		constexpr T& operator[](const blade<N>& p) {
 			return x_[p];
@@ -253,10 +263,6 @@ namespace fms::ga
 			return x_ == b.x_;
 		}
 
-		constexpr bool empty() const
-		{
-			return x_.empty();
-		}
 		// {(x, 0)}
 		constexpr bool is_scalar() const
 		{
@@ -282,7 +288,9 @@ namespace fms::ga
 			std::size_t d = 0;
 
 			for (const auto& [p, x] : x_) {
-				d = (std::max)(d, high_bit(p));
+				if (x) {
+					d = (std::max)(d, order(p));
+				}
 			}
 
 			return d;
